@@ -1,12 +1,13 @@
 import itertools
 
 
-from . import base
+from . import base, types, text
 
 class GroupBase(base.RegexBase):
     """Base class for all group objects."""
 
-    isGroup = True
+    type = types.Group()
+
     wrap = "[[[I AM GROUP {!r}]]]"
 
     def __init__(self, children):
@@ -16,10 +17,18 @@ class GroupBase(base.RegexBase):
     def _getRegex(self, ctx):
         return self.wrap.format(super(GroupBase, self)._getRegex(ctx))
 
+    def asReference(self, ctx):
+        """Return given group as reference (pointer)"""
+        raise NotImplementedError
+
+    def getName(self, ctx):
+        """Return name of given group in given context."""
+        raise NotImplementedError
+
 class HiddenGroup(GroupBase):
     """Hidden group that does not influence resulting matcher."""
 
-    isHiddenGroup = True
+    type = types.HiddenGroup()
     wrap = "(?:{})"
 
     # custom overrides for output regex simplification
@@ -27,7 +36,7 @@ class HiddenGroup(GroupBase):
     _asHiddenGroup = lambda self: self
 
     def append(self, other):
-        if getattr(other, "isHiddenGroup", False):
+        if other.type.isGroup():
             _obj = other
         else:
             _obj = HiddenGroup((other, ))
@@ -37,40 +46,59 @@ class HiddenGroup(GroupBase):
 class Group(GroupBase):
     """Index-accessed group"""
 
-    isIndexedGroup = True
-
+    type = types.IndexedGroup()
     wrap = "({})"
 
     def _getRegex(self, ctx):
-        if ctx.haveVisited(self):
-            for (_id, _grp) in enumerate(itertools.ifilter(lambda el: getattr(el, "isIndexedGroup", False), ctx.visited)):
-                if _grp is self:
-                    _foundId = _id + 1
-                    break
-            else:
-                raise RuntimeError("Expected for this group to have been found")
-
-            return "\\{}".format(_foundId)
+        if tuple(ctx.getVisited(lambda el: el is self)):
+            return self.asReference(ctx)._getRegex(ctx)
         else:
             return super(Group, self)._getRegex(ctx)
+
+    def getName(self, ctx):
+        for (_id, _grp) in enumerate(ctx.getVisited(lambda el: el.type.isIndexedGroup())):
+            if _grp is self:
+                _foundId = _id + 1
+                break
+        else:
+            if ctx.strict:
+                raise RuntimeError("Unable to find this group in current context.")
+            else:
+                _foundId = "!? Unable to determine ID ?!"
+
+        return _foundId
+
+    def asReference(self, ctx):
+        return text.Raw("\\{}".format(self.getName(ctx)))
 
 class NamedGroup(GroupBase):
     """Group accessed by name."""
 
-    isNamedGroup = True
+    type = types.NamedGroup()
     wrap = "(?P<{name}>{regex})"
+    name = None
 
     def __init__(self, children, name):
         super(NamedGroup, self).__init__(children)
         self.name = name
 
     def _getRegex(self, ctx):
-        if ctx.haveVisited(self):
-            return "(?P={})".format(self.name)
+        _visited = tuple(ctx.getVisited(lambda el: el.type.isNamedGroup() and el.name == self.name))
+        if _visited:
+            return self.asReference(ctx)._getRegex(ctx)
         else:
             return self.wrap.format(
                 name=self.name,
                 regex=super(GroupBase, self)._getRegex(ctx),
             )
+
+    def getName(self, ctx):
+        return self.name
+
+    def asReference(self, ctx):
+        return text.Raw("(?P={})".format(self.getName(ctx)))
+
+    def __eq__(self, other):
+        return other.type.isNamedGroup() and self.name == other.name and self.children == other.children
 
 # vim: set sts=4 sw=4 et :

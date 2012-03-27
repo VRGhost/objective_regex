@@ -1,21 +1,23 @@
 import functools
+import itertools
 
 class Context(object):
     """Structural node of a tree that represents regex parsing state"""
 
     _visited = _visiting = None
+    strict = True
 
-    def __init__(self):
+    def __init__(self, strict):
         self._visited = []
         self._visiting = []
+        self.strict = strict
         self.processing = functools.partial(_CtxProcessingToken, self)
 
-    def haveVisited(self, obj):
-        return obj in self._visited
+    def getVisited(self, filterBy=None):
+        if not filterBy:
+            filterBy = lambda el: True
 
-    @property
-    def visited(self):
-        return self._visited
+        return itertools.ifilter(filterBy, self._visited)
 
 class _CtxProcessingToken(object):
 

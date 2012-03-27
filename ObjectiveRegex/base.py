@@ -2,21 +2,29 @@ import re
 import functools
 
 
-from . import construction
+from . import construction, types
 
 class RegexBase(object):
 
-    # List of characters that should be escaped in this particular regexp
-    escapeChars = ('\\', '.', '^', '$', '*', '+', '{', '}', '?', '[', ']', '|', '(', ')')
-
+    escapeChars = ()
     # List of children regex (or text) object
     children = ()
     # Char that is used to join children regex representations.
-    joinChar = ''
+    type = types.BaseType()
 
-    def getRegex(self):
-        """Return the text regexp representation"""
-        _ctx = construction.Context()
+    times = None
+
+    def __init__(self):
+        super(RegexBase, self).__init__()
+        self.times = _TimesObject(self)
+
+    def getRegex(self, strict=True):
+        """Return the text regexp representation
+
+        If `strict` is True, than in case of construction error is detected, an exception should be raised.
+        Otherwise, the object is expected to return a string (but it is not expected to be a correct regex).
+        """
+        _ctx = construction.Context(strict=strict)
         return self._getRegex(_ctx)
 
     def getCompiled(self, flags=0):
@@ -25,8 +33,12 @@ class RegexBase(object):
 
     def escape(self, text):
         """Escape given text string."""
+        _bs = '\\'
+        # backslash is always escaped
+        text = text.replace(_bs, _bs*2)
         for _el in self.escapeChars:
-            text = text.replace(_el, '\\'+_el)
+            assert _el != _bs, "Backslash has been already escaped"
+            text = text.replace(_el, _bs + _el)
         return text
 
 
@@ -47,28 +59,14 @@ class RegexBase(object):
             _rv = groups.Group((self, ))
         return _rv
 
-    @property
-    def times(self):
-        try:
-            return self.__timesCache
-        except AttributeError:
-            self.__timesCache = _rv = _TimesObject(self)
-            return _rv
-
     def _getRegex(self, ctx):
         """Actual regexp construction function."""
         _parts = []
 
         with ctx.processing(self):
             for _child in self.children:
-                try:
-                    _text = _child._getRegex(ctx)
-                except AttributeError:
-                    _text = self.escape(str(_child))
-
-                _parts.append(_text)
-
-        return self.joinChar.join(_parts)
+                _parts.append(self._asRegexObj(_child)._getRegex(ctx))
+        return ''.join(_parts)
 
 
     def _asHiddenGroup(self):
@@ -76,11 +74,27 @@ class RegexBase(object):
         return self._toHiddenGroup(self)
 
     def _toHiddenGroup(self, obj):
-        if getattr(obj, "isGroup", False):
+        if obj.type.isGroup():
             return obj
         else:
             from . import groups
-            return groups.HiddenGroup((obj, ))
+            return groups.HiddenGroup((self._asRegexObj(obj), ))
+
+    def _asRegexObj(self, target):
+        _isRegex = False
+        try:
+            _hndl = target.type
+        except AttributeError:
+            pass
+        else:
+            _isRegex = _hndl.isRegex()
+
+        if _isRegex:
+            _rv = target
+        else:
+            from . import text
+            _rv = text.Text(target)
+        return _rv
 
     __mul__ = lambda s, oth: s.times(oth)
     __add__ = lambda s, oth: s.append(oth)
@@ -89,7 +103,7 @@ class RegexBase(object):
         return self.getRegex()
 
     def __repr__(self):
-        return "<{} {!r}>".format(self.__class__.__name__, self.getRegex())
+        return "<{} {!r}>".format(self.__class__.__name__, self.getRegex(strict=False))
 
 
 class _TimesObject(object):
