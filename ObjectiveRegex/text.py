@@ -13,7 +13,7 @@ class Text(base.RegexBase):
 
     def _getRegex(self, ctx):
         with ctx.processing(self):
-            return self.escape(self.pattern)
+            return self.escape(self.pattern, self.escapeChars)
 
 class Raw(Text):
     """Raw regexp, does not escape magical chars."""

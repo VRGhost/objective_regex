@@ -6,7 +6,6 @@ from . import construction, types
 
 class RegexBase(object):
 
-    escapeChars = ()
     # List of children regex (or text) object
     children = ()
     # Char that is used to join children regex representations.
@@ -31,12 +30,12 @@ class RegexBase(object):
         """Return compiled regex object. """
         return re.compile(self.getRegex(), flags)
 
-    def escape(self, text):
+    def escape(self, text, escapeChars):
         """Escape given text string."""
         _bs = '\\'
         # backslash is always escaped
         text = text.replace(_bs, _bs*2)
-        for _el in self.escapeChars:
+        for _el in escapeChars:
             assert _el != _bs, "Backslash has been already escaped"
             text = text.replace(_el, _bs + _el)
         return text
@@ -44,10 +43,18 @@ class RegexBase(object):
 
     def append(self, *others):
         from .groups import HiddenGroup
-        _grp = self._toHiddenGroup
+        _grp = lambda obj: self._toHiddenGroup(obj, True)
 
         _out = [_grp(self)]
         _out.extend(_grp(_el) for _el in others)
+        return HiddenGroup(_out)
+
+    def prepend(self, *others):
+        from .groups import HiddenGroup
+        _grp = lambda obj: self._toHiddenGroup(obj, True)
+
+        _out = [_grp(_el) for _el in others]
+        _out.append(_grp(self))
         return HiddenGroup(_out)
 
     def asGroup(self, name=None):
@@ -73,12 +80,14 @@ class RegexBase(object):
         """Return this regexp as group that does not appear in the match results."""
         return self._toHiddenGroup(self)
 
-    def _toHiddenGroup(self, obj):
-        if obj.type.isGroup():
-            return obj
-        else:
-            from . import groups
-            return groups.HiddenGroup((self._asRegexObj(obj), ))
+    def _toHiddenGroup(self, obj, forceCls=False):
+        _obj = self._asRegexObj(obj)
+        if _obj.type.isGroup():
+            if not forceCls or (forceCls and _obj.type.isHiddenGroup()):
+                return obj
+        #else
+        from . import groups
+        return groups.HiddenGroup((_obj, ))
 
     def _asRegexObj(self, target):
         _isRegex = False
@@ -98,12 +107,16 @@ class RegexBase(object):
 
     __mul__ = lambda s, oth: s.times(oth)
     __add__ = lambda s, oth: s.append(oth)
+    __radd__ = lambda s, oth: s.prepend(oth)
 
     def __str__(self):
         return self.getRegex()
 
     def __repr__(self):
         return "<{} {!r}>".format(self.__class__.__name__, self.getRegex(strict=False))
+
+    def __eq__(self, other):
+        return self.type == other.type and self.children == other.children
 
 
 class _TimesObject(object):
@@ -126,7 +139,7 @@ class _TimesObject(object):
         """Return regexp that matches if this regexp matches any number of times."""
         return self.opt.AnyNumber(self._trg)
 
-    def some(self):
+    def many(self):
         """Return regexp that matches if this regexp matches non-zero number of times."""
         return self.opt.NonZeroCount(self._trg)
 

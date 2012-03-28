@@ -12,20 +12,9 @@ class Any(base.RegexBase):
         self.children = tuple(children)
 
     def _getRegex(self, ctx):
-
-        _mask = "(?({}){})"
-        _patterns = [self.ifTrue ]
-
-        if self.ifFalse:
-            _mask = "(?({}){}|{})"
-            _patterns.append(self.ifFalse)
-
-        return _mask.format(
-            self.cond.getName(ctx),
-            *(
-                _el._asHiddenGroup()._getRegex(ctx)
-                for _el in _patterns
-            )
+        return "|".join(
+            self._toHiddenGroup(_el)._getRegex(ctx)
+            for _el in self.children
         )
 
 # vim: set sts=4 sw=4

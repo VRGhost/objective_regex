@@ -3,8 +3,10 @@ from .text import Raw
 
 ##Magical custom symbols
 
-ANY = Raw('.')
-SOL = Raw('^') # Start Of Line
-EOL = Raw('$')
+Any = Raw('.')
+Sol = Raw('^') # Start Of Line
+Eol = Raw('$')
+Space = Raw("\s")
+Spaces = Space.times.many()
 
 # vim: set sts=4 sw=4

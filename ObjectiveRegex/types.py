@@ -15,6 +15,22 @@ class BaseType(object):
         setattr(self, name, _rv)
         return _rv
 
+    def getTypes(self):
+        try:
+            return self.__typeCache
+        except AttributeError:
+            _out = []
+            for _name in dir(self):
+                if _name.startswith("is"):
+                    _func = getattr(self, _name)
+                    if _func():
+                        _out.append(_name)
+            self.__typeCache = _out = tuple(_out)
+            return _out
+
+    def __eq__(self, other):
+        return self.getTypes() == other.getTypes()
+
 class Text(BaseType):
     """Plain textual content."""
 

@@ -28,7 +28,7 @@ class If(base.RegexBase):
         return _mask.format(
             self.cond.getName(ctx),
             *(
-                _el._asHiddenGroup()._getRegex(ctx)
+                self._toHiddenGroup(_el)._getRegex(ctx)
                 for _el in _patterns
             )
         )

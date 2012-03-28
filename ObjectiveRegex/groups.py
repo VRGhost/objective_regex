@@ -99,6 +99,6 @@ class NamedGroup(GroupBase):
         return text.Raw("(?P={})".format(self.getName(ctx)))
 
     def __eq__(self, other):
-        return other.type.isNamedGroup() and self.name == other.name and self.children == other.children
+        return self.type == other.type and self.name == other.name and self.children == other.children
 
 # vim: set sts=4 sw=4 et :
