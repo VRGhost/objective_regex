@@ -33,16 +33,6 @@ class HiddenGroup(GroupBase):
 
     # custom overrides for output regex simplification
 
-    _asHiddenGroup = lambda self: self
-
-    def append(self, other):
-        if other.type.isGroup():
-            _obj = other
-        else:
-            _obj = HiddenGroup((other, ))
-        self.children.append(_obj)
-        return self
-
 class Group(GroupBase):
     """Index-accessed group"""
 
