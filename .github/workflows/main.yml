@@ -23,7 +23,6 @@ jobs:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: echo "$GITHUB_CONTEXT"
   test:
-    needs: [ prepare-coverage ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
