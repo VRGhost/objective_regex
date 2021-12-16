@@ -46,9 +46,11 @@ class Group(GroupBase):
             return super(Group, self)._get_regex(ctx)
 
     def get_name(self, ctx):
-        for (_id, _grp) in enumerate(ctx.get_visited(
-            lambda el: types.RegexType.IndexedGroup.implemented_by(el.type)
-        )):
+        for (_id, _grp) in enumerate(
+            ctx.get_visited(
+                lambda el: types.RegexType.IndexedGroup.implemented_by(el.type)
+            )
+        ):
             if _grp is self:
                 _found_id = _id + 1
                 break
@@ -76,9 +78,12 @@ class NamedGroup(GroupBase):
         self.name = name
 
     def _get_regex(self, ctx):
-        _visited = tuple(ctx.get_visited(
-            lambda el: types.RegexType.NamedGroup.implemented_by(el.type) and el.name == self.name
-        ))
+        _visited = tuple(
+            ctx.get_visited(
+                lambda el: types.RegexType.NamedGroup.implemented_by(el.type)
+                and el.name == self.name
+            )
+        )
         if _visited:
             return self.as_reference(ctx)._get_regex(ctx)
         else:
@@ -94,4 +99,8 @@ class NamedGroup(GroupBase):
         return text.Raw("(?P={})".format(self.get_name(ctx)))
 
     def __eq__(self, other):
-        return self.type == other.type and self.name == other.name and self.children == other.children
+        return (
+            self.type == other.type
+            and self.name == other.name
+            and self.children == other.children
+        )

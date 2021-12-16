@@ -10,7 +10,7 @@ class Times(RepeatBase):
     count = 0
 
     def __init__(self, target, count):
-        self.children = (target, )
+        self.children = (target,)
         self.count = count
 
         if count <= 0 or int(count) != count:
@@ -26,21 +26,21 @@ class Times(RepeatBase):
 class RepeatBorders(RepeatBase):
     """Repeats target object several times."""
 
-    max = min = lazy = ''
+    max = min = lazy = ""
 
     def __init__(self, target, min=-1, max=-1, lazy=False):
         super(RepeatBorders, self).__init__()
-        self.children = (target, )
-        self.lazy = '?' if lazy else ''
+        self.children = (target,)
+        self.lazy = "?" if lazy else ""
 
         def _to_limit(cond):
             if not cond:
                 if cond == 0:
                     return 0
                 else:
-                    return ''
+                    return ""
             elif cond < 0:
-                return ''
+                return ""
             else:
                 return cond
 
@@ -48,7 +48,9 @@ class RepeatBorders(RepeatBase):
         _min = _to_limit(min)
 
         if not any(_el and _el > 0 for _el in (_max, _min)):
-            raise RuntimeError("Wrong number of repeats: max={!r}, min={!r}".format(max, min))
+            raise RuntimeError(
+                "Wrong number of repeats: max={!r}, min={!r}".format(max, min)
+            )
 
         self.max = _max
         self.min = _min

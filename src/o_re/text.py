@@ -6,7 +6,7 @@ class Text(base.RegexBase):
 
     type = types.RegexType.Text
     # List of characters that should be escaped in this particular regexp
-    escape_chars = ('.', '^', '$', '*', '+', '{', '}', '?', '[', ']', '|', '(', ')')
+    escape_chars = (".", "^", "$", "*", "+", "{", "}", "?", "[", "]", "|", "(", ")")
 
     def __init__(self, pattern):
         super(Text, self).__init__()

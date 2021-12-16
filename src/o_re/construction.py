@@ -15,6 +15,7 @@ class Context(object):
 
     def get_visited(self, filter_by=None):
         if not filter_by:
+
             def filter_by(el):
                 return True
 
@@ -22,7 +23,6 @@ class Context(object):
 
 
 class _CtxProcessingToken(object):
-
     def __init__(self, context, target):
         self.ctx = context
         self.target = target

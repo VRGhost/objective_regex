@@ -7,7 +7,7 @@ def test_raw():
     assert _pat == _reg.get_regex()
     _text = "kasdhfjkasdhfjkasdfh 4242 laskfjlsdfkjglsdkg"
     _m = _reg.get_compiled().search(_text)
-    assert _m.groups() == ("4242", )
+    assert _m.groups() == ("4242",)
 
 
 def test_text():

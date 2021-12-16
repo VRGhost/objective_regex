@@ -1,4 +1,4 @@
-__VERSION__ = '0.1.1'
+__VERSION__ = "0.1.1"
 
 from . import (
     ops,
@@ -7,7 +7,9 @@ from . import (
 from .conditional import If
 from .symbols import (
     Any,
-    Eol, Sol,
-    Space, Spaces,
+    Eol,
+    Sol,
+    Space,
+    Spaces,
 )
 from .text import Raw, Text
