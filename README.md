@@ -3,6 +3,7 @@ Python objective regular expression library
 
 [![CI](https://github.com/VRGhost/objective_regex/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/VRGhost/objective_regex/actions/workflows/main.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![PyPI version](https://badge.fury.io/py/objective-regex.svg)](https://badge.fury.io/py/objective-regex)
 
 * Do you work with regular expressions often?
 * Do you want for them to me better readable and easier to support?
