@@ -39,26 +39,8 @@ jobs:
           pip install tox tox-gh-actions
       - name: Test with tox
         run: tox
-  bump-version:
-    needs: test
-    runs-on: ubuntu-latest
-    # Bump version in the PR that targets the "main" branch
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-      - name: Install dependencies
-        run: |
-          pip install bump2version
-      - name: Bump version
-        run: |
-          git config --global user.email "github+actions@gmail.com"
-          git config --global user.name "Actions"
-          bump2version patch
-          git push --follow-tags
   publish:
-    needs: [test, bump-version]
+    needs: test
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     steps:
@@ -79,3 +61,21 @@ jobs:
         uses: pypa/gh-action-pypi-publish@master
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
+  bump-version: # Bump version for the next release
+    needs: publish
+    runs-on: ubuntu-latest
+    # Bump version in the PR that targets the "main" branch
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+      - name: Install dependencies
+        run: |
+          pip install bump2version
+      - name: Bump version
+        run: |
+          git config --global user.email "github+actions@gmail.com"
+          git config --global user.name "Actions"
+          bump2version patch
+          git push --follow-tags
