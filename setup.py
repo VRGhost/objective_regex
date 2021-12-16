@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="o_re",
+    name="objective_regex",
     version="0.0.3",
     author="Ilja Orlovs",
     author_email="vrghost@gmail.com",
