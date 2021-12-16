@@ -1,4 +1,4 @@
-__VERSION__ = '0.0.10'
+__VERSION__ = '0.1.0'
 
 from . import (
     ops,
