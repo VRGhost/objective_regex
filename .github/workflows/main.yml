@@ -52,9 +52,9 @@ jobs:
           bump2version patch
           git push --follow-tags
   publish:
-    needs: bump-version
+    needs: [test, bump-version]
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && ( github.base_ref == 'refs/heads/main' || github.base_ref == 'refs/heads/release' )
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
@@ -64,6 +64,7 @@ jobs:
       - name: Build packages
         run: python -m build --outdir dist/
       - name: Publish distribution to Test PyPI
+        if: github.ref == 'refs/heads/main'
         uses: pypa/gh-action-pypi-publish@master
         with:
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
