@@ -14,6 +14,14 @@ on:
   workflow_dispatch:
 
 jobs:
+  debug:
+    # This is just a debug job for assorted github vars I am using
+    runs-on: ubuntu-latest
+    steps:
+      - name: GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -31,10 +39,6 @@ jobs:
           pip install tox tox-gh-actions
       - name: Test with tox
         run: tox
-      - name: test
-        run:
-          echo "${{github.event_name}}"
-          echo "${{github.base_ref}}"
   bump-version:
     needs: test
     runs-on: ubuntu-latest
