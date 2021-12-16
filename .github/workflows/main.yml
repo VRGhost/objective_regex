@@ -22,6 +22,13 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: echo "$GITHUB_CONTEXT"
+  prepare-coverage:
+    steps:
+      - name: Prepare
+        run: |
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          chmod +x ./cc-test-reporter
+          ./cc-test-reporter before-build
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -43,7 +50,9 @@ jobs:
     needs: [ test ]
     runs-on: ubuntu-latest
     steps:
-      - uses: paambaati/codeclimate-action@v3.0.0
+      - name: Report Coverage
+        run: |
+          ./cc-test-reporter after-build  --coverage-input-type coverage.py -r "${CC_TEST_REPORTER_ID}"
         env:
           CC_TEST_REPORTER_ID: e094dbb0c98dd73c7b0b11efe7c2ef74cc821c5d81e6025a64fd20c3bb3b5a5d
         with:
