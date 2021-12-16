@@ -6,18 +6,18 @@ class Text(base.RegexBase):
 
     type = types.RegexType.Text
     # List of characters that should be escaped in this particular regexp
-    escapeChars = ('.', '^', '$', '*', '+', '{', '}', '?', '[', ']', '|', '(', ')')
+    escape_chars = ('.', '^', '$', '*', '+', '{', '}', '?', '[', ']', '|', '(', ')')
 
     def __init__(self, pattern):
         super(Text, self).__init__()
         self.pattern = pattern
 
-    def _getRegex(self, ctx):
+    def _get_regex(self, ctx):
         with ctx.processing(self):
-            return self.escape(self.pattern, self.escapeChars)
+            return self.escape(self.pattern, self.escape_chars)
 
     def __eq__(self, other):
-        return super().__eq__(other) and (self.getRegex() == other.getRegex())
+        return super().__eq__(other) and (self.get_regex() == other.get_regex())
 
 
 class Raw(Text):
@@ -25,6 +25,6 @@ class Raw(Text):
 
     type = types.RegexType.Raw
 
-    def _getRegex(self, ctx):
+    def _get_regex(self, ctx):
         with ctx.processing(self):
             return self.pattern

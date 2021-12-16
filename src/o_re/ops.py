@@ -3,14 +3,14 @@ from . import base
 
 class Any(base.RegexBase):
 
-    joinChar = '|'
+    join_char = '|'
 
     def __init__(self, children):
         super(Any, self).__init__()
         self.children = tuple(children)
 
-    def _getRegex(self, ctx):
-        return "|".join(
-            self._toHiddenGroup(_el)._getRegex(ctx)
+    def _get_regex(self, ctx):
+        return self.join_char.join(
+            self._to_hidden_group(_el)._get_regex(ctx)
             for _el in self.children
         )

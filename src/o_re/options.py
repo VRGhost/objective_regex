@@ -9,8 +9,8 @@ class OptionBase(base.RegexBase):
         super(OptionBase, self).__init__()
         self.children = (child, )
 
-    def _getRegex(self, ctx):
-        return self.wrap.format(super(OptionBase, self)._getRegex(ctx))
+    def _get_regex(self, ctx):
+        return self.wrap.format(super()._get_regex(ctx))
 
 
 class Optional(OptionBase):

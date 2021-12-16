@@ -16,25 +16,25 @@ class RegexBase(object):
         super(RegexBase, self).__init__()
         self.times = _TimesObject(self)
 
-    def getRegex(self, strict=True):
+    def get_regex(self, strict=True):
         """Return the text regexp representation
 
         If `strict` is True, than in case of construction error is detected, an exception should be raised.
         Otherwise, the object is expected to return a string (but it is not expected to be a correct regex).
         """
         _ctx = construction.Context(strict=strict)
-        return self._getRegex(_ctx)
+        return self._get_regex(_ctx)
 
-    def getCompiled(self, flags=0):
+    def get_compiled(self, flags=0):
         """Return compiled regex object. """
-        return re.compile(self.getRegex(), flags)
+        return re.compile(self.get_regex(), flags)
 
-    def escape(self, text, escapeChars):
+    def escape(self, text, escape_chars):
         """Escape given text string."""
         _bs = '\\'
         # backslash is always escaped
         text = text.replace(_bs, _bs*2)
-        for _el in escapeChars:
+        for _el in escape_chars:
             assert _el != _bs, "Backslash has been already escaped"
             text = text.replace(_el, _bs + _el)
         return text
@@ -43,7 +43,7 @@ class RegexBase(object):
         from .groups import HiddenGroup
 
         def _grp(obj):
-            return self._toHiddenGroup(obj, True)
+            return self._to_hidden_group(obj, True)
 
         _out = [_grp(self)]
         _out.extend(_grp(_el) for _el in others)
@@ -53,13 +53,13 @@ class RegexBase(object):
         from .groups import HiddenGroup
 
         def _grp(obj):
-            return self._toHiddenGroup(obj, True)
+            return self._to_hidden_group(obj, True)
 
         _out = [_grp(_el) for _el in others]
         _out.append(_grp(self))
         return HiddenGroup(_out)
 
-    def asGroup(self, name=None):
+    def as_group(self, name=None):
         """Return given regexp as group.
 
         If `name` parameter is passed, than named group is created. Otherwise the id-numbered group is used.
@@ -71,38 +71,38 @@ class RegexBase(object):
             _rv = groups.Group((self, ))
         return _rv
 
-    def _getRegex(self, ctx):
+    def _get_regex(self, ctx):
         """Actual regexp construction function."""
         _parts = []
 
         with ctx.processing(self):
             for _child in self.children:
-                _parts.append(self._asRegexObj(_child)._getRegex(ctx))
+                _parts.append(self._as_regex_obj(_child)._get_regex(ctx))
         return ''.join(_parts)
 
-    def _asHiddenGroup(self):
+    def _as_hidden_group(self):
         """Return this regexp as group that does not appear in the match results."""
-        return self._toHiddenGroup(self)
+        return self._to_hidden_group(self)
 
-    def _toHiddenGroup(self, obj, forceCls=False):
-        _obj = self._asRegexObj(obj)
+    def _to_hidden_group(self, obj, force_cls=False):
+        _obj = self._as_regex_obj(obj)
         if _obj.type & types.RegexType.Group:
-            if not forceCls or (forceCls and types.RegexType.HiddenGroup.implemented_by(_obj.type)):
+            if not force_cls or (force_cls and types.RegexType.HiddenGroup.implemented_by(_obj.type)):
                 return obj
         # else
         from . import groups
         return groups.HiddenGroup((_obj, ))
 
-    def _asRegexObj(self, target):
-        _isRegex = False
+    def _as_regex_obj(self, target):
+        _is_regex = False
         try:
             _hndl = target.type
         except AttributeError:
             pass
         else:
-            _isRegex = isinstance(_hndl, types.RegexType)
+            _is_regex = isinstance(_hndl, types.RegexType)
 
-        if _isRegex:
+        if _is_regex:
             _rv = target
         else:
             from . import text
@@ -119,10 +119,10 @@ class RegexBase(object):
         return self.prepend(other)
 
     def __str__(self):
-        return self.getRegex()
+        return self.get_regex()
 
     def __repr__(self):
-        return "<{} {!r}>".format(self.__class__.__name__, self.getRegex(strict=False))
+        return "<{} {!r}>".format(self.__class__.__name__, self.get_regex(strict=False))
 
     def __eq__(self, other):
         return self.type == other.type and self.children == other.children
@@ -157,4 +157,4 @@ class _TimesObject(object):
 
     @property
     def _trg(self):
-        return self.reg._asHiddenGroup()
+        return self.reg._as_hidden_group()

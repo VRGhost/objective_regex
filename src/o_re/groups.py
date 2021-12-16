@@ -12,14 +12,14 @@ class GroupBase(base.RegexBase):
         super(GroupBase, self).__init__()
         self.children = list(children)
 
-    def _getRegex(self, ctx):
-        return self.wrap.format(super(GroupBase, self)._getRegex(ctx))
+    def _get_regex(self, ctx):
+        return self.wrap.format(super(GroupBase, self)._get_regex(ctx))
 
-    def asReference(self, ctx):
+    def as_reference(self, ctx):
         """Return given group as reference (pointer)"""
         raise NotImplementedError
 
-    def getName(self, ctx):
+    def get_name(self, ctx):
         """Return name of given group in given context."""
         raise NotImplementedError
 
@@ -39,29 +39,29 @@ class Group(GroupBase):
     type = types.RegexType.IndexedGroup
     wrap = "({})"
 
-    def _getRegex(self, ctx):
-        if tuple(ctx.getVisited(lambda el: el is self)):
-            return self.asReference(ctx)._getRegex(ctx)
+    def _get_regex(self, ctx):
+        if tuple(ctx.get_visited(lambda el: el is self)):
+            return self.as_reference(ctx)._get_regex(ctx)
         else:
-            return super(Group, self)._getRegex(ctx)
+            return super(Group, self)._get_regex(ctx)
 
-    def getName(self, ctx):
-        for (_id, _grp) in enumerate(ctx.getVisited(
+    def get_name(self, ctx):
+        for (_id, _grp) in enumerate(ctx.get_visited(
             lambda el: types.RegexType.IndexedGroup.implemented_by(el.type)
         )):
             if _grp is self:
-                _foundId = _id + 1
+                _found_id = _id + 1
                 break
         else:
             if ctx.strict:
                 raise RuntimeError("Unable to find this group in current context.")
             else:
-                _foundId = "!? Unable to determine ID ?!"
+                _found_id = "!? Unable to determine ID ?!"
 
-        return _foundId
+        return _found_id
 
-    def asReference(self, ctx):
-        return text.Raw("\\{}".format(self.getName(ctx)))
+    def as_reference(self, ctx):
+        return text.Raw("\\{}".format(self.get_name(ctx)))
 
 
 class NamedGroup(GroupBase):
@@ -75,23 +75,23 @@ class NamedGroup(GroupBase):
         super(NamedGroup, self).__init__(children)
         self.name = name
 
-    def _getRegex(self, ctx):
-        _visited = tuple(ctx.getVisited(
+    def _get_regex(self, ctx):
+        _visited = tuple(ctx.get_visited(
             lambda el: types.RegexType.NamedGroup.implemented_by(el.type) and el.name == self.name
         ))
         if _visited:
-            return self.asReference(ctx)._getRegex(ctx)
+            return self.as_reference(ctx)._get_regex(ctx)
         else:
             return self.wrap.format(
                 name=self.name,
-                regex=super(GroupBase, self)._getRegex(ctx),
+                regex=super(GroupBase, self)._get_regex(ctx),
             )
 
-    def getName(self, ctx):
+    def get_name(self, ctx):
         return self.name
 
-    def asReference(self, ctx):
-        return text.Raw("(?P={})".format(self.getName(ctx)))
+    def as_reference(self, ctx):
+        return text.Raw("(?P={})".format(self.get_name(ctx)))
 
     def __eq__(self, other):
         return self.type == other.type and self.name == other.name and self.children == other.children

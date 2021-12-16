@@ -13,12 +13,12 @@ class Context(object):
         self.strict = strict
         self.processing = functools.partial(_CtxProcessingToken, self)
 
-    def getVisited(self, filterBy=None):
-        if not filterBy:
-            def filterBy(el):
+    def get_visited(self, filter_by=None):
+        if not filter_by:
+            def filter_by(el):
                 return True
 
-        return (el for el in self._visited if filterBy(el))
+        return (el for el in self._visited if filter_by(el))
 
 
 class _CtxProcessingToken(object):
