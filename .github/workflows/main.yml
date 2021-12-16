@@ -39,3 +39,19 @@ jobs:
           pip install tox tox-gh-actions
       - name: Test with tox
         run: tox
+  report-coverage:
+    needs: [ test ]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/setup-node@master
+      with:
+        node-version: '12'
+    - run: npm install -g yarn
+    - run: yarn install
+    - run: yarn build
+    - uses: paambaati/codeclimate-action@v2.2.4
+      env:
+        CC_TEST_REPORTER_ID: e094dbb0c98dd73c7b0b11efe7c2ef74cc821c5d81e6025a64fd20c3bb3b5a5d
+      with:
+        coverageCommand: yarn coverage
