@@ -15,6 +15,9 @@ class Text(base.RegexBase):
         with ctx.processing(self):
             return self.escape(self.pattern, self.escapeChars)
 
+    def __eq__(self, other):
+        return super().__eq__(other) and (self.getRegex() == other.getRegex())
+
 class Raw(Text):
     """Raw regexp, does not escape magical chars."""
 

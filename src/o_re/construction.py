@@ -1,5 +1,4 @@
 import functools
-import itertools
 
 class Context(object):
     """Structural node of a tree that represents regex parsing state"""
@@ -17,7 +16,7 @@ class Context(object):
         if not filterBy:
             filterBy = lambda el: True
 
-        return itertools.ifilter(filterBy, self._visited)
+        return (el for el in self._visited if filterBy(el))
 
 class _CtxProcessingToken(object):
 
