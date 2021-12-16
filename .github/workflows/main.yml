@@ -41,7 +41,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     # Bump version in the PR that targets the "main" branch
-    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'refs/heads/main' }}
+    if: ${{ github.event_name == 'pull_request' && github.base_ref == 'main' }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
@@ -58,7 +58,7 @@ jobs:
   publish:
     needs: [test, bump-version]
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && ( github.base_ref == 'refs/heads/main' || github.base_ref == 'refs/heads/release' ) }}
+    if: ${{ github.event_name == 'push' && ( github.base_ref == 'main' || github.base_ref == 'release' ) }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
@@ -68,13 +68,13 @@ jobs:
       - name: Build packages
         run: python -m build --outdir dist/
       - name: Publish distribution to Test PyPI
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'main' }}
         uses: pypa/gh-action-pypi-publish@master
         with:
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
           repository_url: https://test.pypi.org/legacy/
       - name: Publish distribution to PRODUCTION PyPI
-        if: ${{ github.ref == 'refs/heads/release' }}
+        if: ${{ github.ref == 'release' }}
         uses: pypa/gh-action-pypi-publish@master
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
