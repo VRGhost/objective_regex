@@ -55,9 +55,7 @@ jobs:
         run: |
           git config --global user.email "github+actions@gmail.com"
           git config --global user.name "Actions"
-          CURRENT_VERSION=$(git tag --sort=-v:refname --list "v[0-9]*" | head -n 1)
-          echo "Current version :${CURRENT_VERSION}"
-          bump2version --current-version "${CURRENT_VERSION}" patch
+          bump2version patch
           git push --follow-tags
   publish:
     needs: [test, bump-version]
