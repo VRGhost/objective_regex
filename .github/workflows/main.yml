@@ -23,6 +23,7 @@ jobs:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: echo "$GITHUB_CONTEXT"
   prepare-coverage:
+    runs-on: ubuntu-latest
     steps:
       - name: Prepare
         run: |
@@ -30,6 +31,7 @@ jobs:
           chmod +x ./cc-test-reporter
           ./cc-test-reporter before-build
   test:
+    needs: [ prepare-coverage ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -47,7 +49,9 @@ jobs:
       - name: Test with tox
         run: tox
   report-coverage:
-    needs: [ test ]
+    needs:
+      - prepare-coverage
+      - test
     runs-on: ubuntu-latest
     steps:
       - name: Report Coverage
