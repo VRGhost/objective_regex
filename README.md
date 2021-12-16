@@ -1,6 +1,8 @@
 Python objective regular expression library
 ==============================
 
+[![CI](https://github.com/VRGhost/objective_regex/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/VRGhost/objective_regex/actions/workflows/main.yml)
+
 * Do you work with regular expressions often?
 * Do you want for them to me better readable and easier to support?
 
