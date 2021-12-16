@@ -1,5 +1,6 @@
 from . import symbols
 
+
 def space_sep(words, strict=True):
     _out = None
 
@@ -16,10 +17,9 @@ def space_sep(words, strict=True):
 
     return _out
 
+
 def force_full_line(reg, strict=True):
     if strict:
         return symbols.Sol + reg + symbols.Eol
     else:
         return space_sep((symbols.Sol, reg, symbols.Eol), False)
-
-# vim: set sts=4 sw=4

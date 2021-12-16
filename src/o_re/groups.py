@@ -1,12 +1,10 @@
-import itertools
+from . import base, text, types
 
-
-from . import base, types, text
 
 class GroupBase(base.RegexBase):
     """Base class for all group objects."""
 
-    type = types.Group()
+    type = types.RegexType.Group
 
     wrap = "[[[I AM GROUP {!r}]]]"
 
@@ -25,18 +23,20 @@ class GroupBase(base.RegexBase):
         """Return name of given group in given context."""
         raise NotImplementedError
 
+
 class HiddenGroup(GroupBase):
     """Hidden group that does not influence resulting matcher."""
 
-    type = types.HiddenGroup()
+    type = types.RegexType.HiddenGroup
     wrap = "(?:{})"
 
     # custom overrides for output regex simplification
 
+
 class Group(GroupBase):
     """Index-accessed group"""
 
-    type = types.IndexedGroup()
+    type = types.RegexType.IndexedGroup
     wrap = "({})"
 
     def _getRegex(self, ctx):
@@ -46,7 +46,9 @@ class Group(GroupBase):
             return super(Group, self)._getRegex(ctx)
 
     def getName(self, ctx):
-        for (_id, _grp) in enumerate(ctx.getVisited(lambda el: el.type.isIndexedGroup())):
+        for (_id, _grp) in enumerate(ctx.getVisited(
+            lambda el: types.RegexType.IndexedGroup.implemented_by(el.type)
+        )):
             if _grp is self:
                 _foundId = _id + 1
                 break
@@ -61,10 +63,11 @@ class Group(GroupBase):
     def asReference(self, ctx):
         return text.Raw("\\{}".format(self.getName(ctx)))
 
+
 class NamedGroup(GroupBase):
     """Group accessed by name."""
 
-    type = types.NamedGroup()
+    type = types.RegexType.NamedGroup
     wrap = "(?P<{name}>{regex})"
     name = None
 
@@ -73,7 +76,9 @@ class NamedGroup(GroupBase):
         self.name = name
 
     def _getRegex(self, ctx):
-        _visited = tuple(ctx.getVisited(lambda el: el.type.isNamedGroup() and el.name == self.name))
+        _visited = tuple(ctx.getVisited(
+            lambda el: types.RegexType.NamedGroup.implemented_by(el.type) and el.name == self.name
+        ))
         if _visited:
             return self.asReference(ctx)._getRegex(ctx)
         else:
@@ -90,5 +95,3 @@ class NamedGroup(GroupBase):
 
     def __eq__(self, other):
         return self.type == other.type and self.name == other.name and self.children == other.children
-
-# vim: set sts=4 sw=4 et :

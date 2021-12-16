@@ -1,7 +1,11 @@
-# form .
-from .text import Text, Raw
-from .symbols import *
+from . import (
+    ops,
+    tools,
+)
 from .conditional import If
-from . import tools, ops
-
-# vim: set sts=4 sw=4
+from .symbols import (
+    Any,
+    Eol, Sol,
+    Space, Spaces,
+)
+from .text import Raw, Text

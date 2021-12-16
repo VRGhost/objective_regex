@@ -4,6 +4,7 @@ from . import base
 class RepeatBase(base.RegexBase):
     """Base class for all repeat objects."""
 
+
 class Times(RepeatBase):
 
     count = 0
@@ -20,6 +21,7 @@ class Times(RepeatBase):
             regex=super(Times, self)._getRegex(ctx),
             times=self.count,
         )
+
 
 class RepeatBorders(RepeatBase):
     """Repeats target object several times."""
@@ -58,5 +60,3 @@ class RepeatBorders(RepeatBase):
             max=self.max,
             lazy=self.lazy,
         )
-
-# vim: set sts=4 sw=4 et :

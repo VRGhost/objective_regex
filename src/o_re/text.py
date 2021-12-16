@@ -1,9 +1,10 @@
 from . import base, types
 
+
 class Text(base.RegexBase):
     """Matches plain text string."""
 
-    type = types.Text()
+    type = types.RegexType.Text
     # List of characters that should be escaped in this particular regexp
     escapeChars = ('.', '^', '$', '*', '+', '{', '}', '?', '[', ']', '|', '(', ')')
 
@@ -18,13 +19,12 @@ class Text(base.RegexBase):
     def __eq__(self, other):
         return super().__eq__(other) and (self.getRegex() == other.getRegex())
 
+
 class Raw(Text):
     """Raw regexp, does not escape magical chars."""
 
-    type = types.Raw()
+    type = types.RegexType.Raw
 
     def _getRegex(self, ctx):
         with ctx.processing(self):
             return self.pattern
-
-# vim: set sts=4 sw=4 et :

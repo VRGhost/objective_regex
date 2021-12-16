@@ -1,15 +1,14 @@
 import re
-import functools
-
 
 from . import construction, types
+
 
 class RegexBase(object):
 
     # List of children regex (or text) object
     children = ()
     # Char that is used to join children regex representations.
-    type = types.BaseType()
+    type = types.RegexType.Unknown
 
     times = None
 
@@ -40,10 +39,11 @@ class RegexBase(object):
             text = text.replace(_el, _bs + _el)
         return text
 
-
     def append(self, *others):
         from .groups import HiddenGroup
-        _grp = lambda obj: self._toHiddenGroup(obj, True)
+
+        def _grp(obj):
+            return self._toHiddenGroup(obj, True)
 
         _out = [_grp(self)]
         _out.extend(_grp(_el) for _el in others)
@@ -51,14 +51,19 @@ class RegexBase(object):
 
     def prepend(self, *others):
         from .groups import HiddenGroup
-        _grp = lambda obj: self._toHiddenGroup(obj, True)
+
+        def _grp(obj):
+            return self._toHiddenGroup(obj, True)
 
         _out = [_grp(_el) for _el in others]
         _out.append(_grp(self))
         return HiddenGroup(_out)
 
     def asGroup(self, name=None):
-        """ Return given regexp as group. If `name` parameter is passed, than named group is created. Otherwise the id-numbered group is used."""
+        """Return given regexp as group.
+
+        If `name` parameter is passed, than named group is created. Otherwise the id-numbered group is used.
+        """
         from . import groups
         if name:
             _rv = groups.NamedGroup((self,), name)
@@ -75,17 +80,16 @@ class RegexBase(object):
                 _parts.append(self._asRegexObj(_child)._getRegex(ctx))
         return ''.join(_parts)
 
-
     def _asHiddenGroup(self):
         """Return this regexp as group that does not appear in the match results."""
         return self._toHiddenGroup(self)
 
     def _toHiddenGroup(self, obj, forceCls=False):
         _obj = self._asRegexObj(obj)
-        if _obj.type.isGroup():
-            if not forceCls or (forceCls and _obj.type.isHiddenGroup()):
+        if _obj.type & types.RegexType.Group:
+            if not forceCls or (forceCls and types.RegexType.HiddenGroup.implemented_by(_obj.type)):
                 return obj
-        #else
+        # else
         from . import groups
         return groups.HiddenGroup((_obj, ))
 
@@ -96,7 +100,7 @@ class RegexBase(object):
         except AttributeError:
             pass
         else:
-            _isRegex = _hndl.isRegex()
+            _isRegex = isinstance(_hndl, types.RegexType)
 
         if _isRegex:
             _rv = target
@@ -105,9 +109,14 @@ class RegexBase(object):
             _rv = text.Text(target)
         return _rv
 
-    __mul__ = lambda s, oth: s.times(oth)
-    __add__ = lambda s, oth: s.append(oth)
-    __radd__ = lambda s, oth: s.prepend(oth)
+    def __mul__(self, other):
+        return self.times(other)
+
+    def __add__(self, other):
+        return self.append(other)
+
+    def __radd__(self, other):
+        return self.prepend(other)
 
     def __str__(self):
         return self.getRegex()
@@ -149,5 +158,3 @@ class _TimesObject(object):
     @property
     def _trg(self):
         return self.reg._asHiddenGroup()
-
-# vim: set sts=4 sw=4 et :

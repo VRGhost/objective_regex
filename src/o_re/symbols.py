@@ -1,12 +1,9 @@
-# form .
 from .text import Raw
 
-##Magical custom symbols
+# Magical custom symbols
 
 Any = Raw('.')
-Sol = Raw('^') # Start Of Line
+Sol = Raw('^')  # Start Of Line
 Eol = Raw('$')
-Space = Raw("\s")
+Space = Raw(r"\s")
 Spaces = Space.times.many()
-
-# vim: set sts=4 sw=4

@@ -1,10 +1,9 @@
-# form .
-
 from . import base, types
+
 
 class If(base.RegexBase):
 
-    type = types.Group()
+    type = types.RegexType.Group
 
     cond = ifTrue = ifFalse = None
 
@@ -19,7 +18,7 @@ class If(base.RegexBase):
     def _getRegex(self, ctx):
 
         _mask = "(?({}){})"
-        _patterns = [self.ifTrue ]
+        _patterns = [self.ifTrue]
 
         if self.ifFalse:
             _mask = "(?({}){}|{})"
@@ -32,5 +31,3 @@ class If(base.RegexBase):
                 for _el in _patterns
             )
         )
-
-# vim: set sts=4 sw=4

@@ -1,5 +1,6 @@
 import functools
 
+
 class Context(object):
     """Structural node of a tree that represents regex parsing state"""
 
@@ -14,9 +15,11 @@ class Context(object):
 
     def getVisited(self, filterBy=None):
         if not filterBy:
-            filterBy = lambda el: True
+            def filterBy(el):
+                return True
 
         return (el for el in self._visited if filterBy(el))
+
 
 class _CtxProcessingToken(object):
 
@@ -30,5 +33,3 @@ class _CtxProcessingToken(object):
     def __exit__(self, *tb):
         self.ctx._visiting.remove(self.target)
         self.ctx._visited.append(self.target)
-
-# vim: set sts=4 sw=4

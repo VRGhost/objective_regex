@@ -1,6 +1,5 @@
-# form .
+from . import base
 
-from . import base, types
 
 class Any(base.RegexBase):
 
@@ -8,7 +7,6 @@ class Any(base.RegexBase):
 
     def __init__(self, children):
         super(Any, self).__init__()
-
         self.children = tuple(children)
 
     def _getRegex(self, ctx):
@@ -16,5 +14,3 @@ class Any(base.RegexBase):
             self._toHiddenGroup(_el)._getRegex(ctx)
             for _el in self.children
         )
-
-# vim: set sts=4 sw=4
