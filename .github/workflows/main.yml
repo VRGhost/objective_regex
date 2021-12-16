@@ -36,7 +36,8 @@ jobs:
   bump-version:
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Bump version in the PR that targets the "main" branch
+    if: github.event_name == 'pull_request' && github.base_ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
