@@ -7,7 +7,7 @@ class OptionBase(base.RegexBase):
 
     def __init__(self, child):
         super(OptionBase, self).__init__()
-        self.children = (child, )
+        self.children = (child,)
 
     def _get_regex(self, ctx):
         return self.wrap.format(super()._get_regex(ctx))

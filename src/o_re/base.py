@@ -26,14 +26,14 @@ class RegexBase(object):
         return self._get_regex(_ctx)
 
     def get_compiled(self, flags=0):
-        """Return compiled regex object. """
+        """Return compiled regex object."""
         return re.compile(self.get_regex(), flags)
 
     def escape(self, text, escape_chars):
         """Escape given text string."""
-        _bs = '\\'
+        _bs = "\\"
         # backslash is always escaped
-        text = text.replace(_bs, _bs*2)
+        text = text.replace(_bs, _bs * 2)
         for _el in escape_chars:
             assert _el != _bs, "Backslash has been already escaped"
             text = text.replace(_el, _bs + _el)
@@ -65,10 +65,11 @@ class RegexBase(object):
         If `name` parameter is passed, than named group is created. Otherwise the id-numbered group is used.
         """
         from . import groups
+
         if name:
             _rv = groups.NamedGroup((self,), name)
         else:
-            _rv = groups.Group((self, ))
+            _rv = groups.Group((self,))
         return _rv
 
     def _get_regex(self, ctx):
@@ -78,7 +79,7 @@ class RegexBase(object):
         with ctx.processing(self):
             for _child in self.children:
                 _parts.append(self._as_regex_obj(_child)._get_regex(ctx))
-        return ''.join(_parts)
+        return "".join(_parts)
 
     def _as_hidden_group(self):
         """Return this regexp as group that does not appear in the match results."""
@@ -87,11 +88,14 @@ class RegexBase(object):
     def _to_hidden_group(self, obj, force_cls=False):
         _obj = self._as_regex_obj(obj)
         if _obj.type & types.RegexType.Group:
-            if not force_cls or (force_cls and types.RegexType.HiddenGroup.implemented_by(_obj.type)):
+            if not force_cls or (
+                force_cls and types.RegexType.HiddenGroup.implemented_by(_obj.type)
+            ):
                 return obj
         # else
         from . import groups
-        return groups.HiddenGroup((_obj, ))
+
+        return groups.HiddenGroup((_obj,))
 
     def _as_regex_obj(self, target):
         _is_regex = False
@@ -106,6 +110,7 @@ class RegexBase(object):
             _rv = target
         else:
             from . import text
+
             _rv = text.Text(target)
         return _rv
 
@@ -129,10 +134,10 @@ class RegexBase(object):
 
 
 class _TimesObject(object):
-
     def __init__(self, regex):
         self.reg = regex
         from . import repeats, options
+
         self.rep = repeats
         self.opt = options
 
