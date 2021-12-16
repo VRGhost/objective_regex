@@ -43,7 +43,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     # Bump version in the PR that targets the "main" branch
-    if: ${{ github.event_name == 'push' && github.base_ref == 'main' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
@@ -60,7 +60,7 @@ jobs:
   publish:
     needs: [test, bump-version]
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.base_ref == 'main' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
