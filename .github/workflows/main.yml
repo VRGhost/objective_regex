@@ -59,5 +59,3 @@ jobs:
           ./cc-test-reporter after-build  --coverage-input-type coverage.py -r "${CC_TEST_REPORTER_ID}"
         env:
           CC_TEST_REPORTER_ID: e094dbb0c98dd73c7b0b11efe7c2ef74cc821c5d81e6025a64fd20c3bb3b5a5d
-        with:
-          coverageCommand: yarn coverage
