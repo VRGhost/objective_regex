@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="objective_regex",
-    version="0.0.6",
+    version="0.0.7",
     author="Ilja Orlovs",
     author_email="vrghost@gmail.com",
     description="Objective regular expressions",
